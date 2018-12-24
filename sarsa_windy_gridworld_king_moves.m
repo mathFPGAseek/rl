@@ -26,7 +26,7 @@ y = 7;
 epsilon = .1;      % for greedy policy
 alpha = .5;        % step size
 gamma = .9;        % discount rate
-q = zeros(7,10,8); % action-state space
+q = zeros(7,10,9); % action-state space
 q(4,8,:) = 0;      % terminal value zero; Note coordinate from upperleft
 episodes = 170;
 
@@ -43,7 +43,7 @@ for n = 1: episodes
     if( 1-epsilon > random)
         [max_value,a_current] = max(q(i_current,j_current,:));
     else
-        a_current = randi(8,1);
+        a_current = randi(9,1); % note 9 moves , inc no move
     end
     
     windsurfing = 1;
@@ -76,6 +76,9 @@ for n = 1: episodes
             case 8 % lower lft diagonal
                 i_update = i_current+1;
                 j_update = j_current-1;
+            case 9 % no move
+                i_update = i_current;
+                j_update = j_current;
                 
             otherwise
                 i_update = 4;
@@ -132,7 +135,7 @@ for n = 1: episodes
      if( 1-epsilon > random)
         [max_value,a_update] = max(q(i_update,j_update,:));
      else
-        a_update = randi(8,1);
+        a_update = randi(9,1);
      end
      q(i_current,j_current,a_current) =  q(i_current,j_current,a_current) +...
          alpha*(r + gamma*q(i_update,j_update,a_update) - ...

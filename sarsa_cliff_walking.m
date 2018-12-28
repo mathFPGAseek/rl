@@ -1,20 +1,23 @@
 %-------------------------------------------------------------------------
-% script file: q_learning_cliff_walking.m
-% 12/27/18 Ray Duran,engineer,baycool0422@gmail.com
+% script file: sarsa_cliff_walking.m
+% 12/28/18 Ray Duran,engineer,baycool0422@gmail.com
 % github repository: https://github/mathFPGAseek/rl
-% Example 6.6 Cliff Walking with Q-learning
+% Example 6.6 Cliff Walking SARSA
 % Sutton, "Reinforcement Learning,An Introduction, 2nd ed" pg 132
-% Algo:
+%
+%---------------------
+% Algo SARSA:
 % Parameters: step size: alpha(0,1], small epsilon > 0
 % Initialize Q(s,a), for all s,a, except Q(terminal,.) = 0
 %
 %  Loop for each epsiode
 %   Initialize S
+%   Choose A from S using policy derived from Q( epsilon greedy)
 %   Loop for each step of episode:
-%       Choose A from S using policy dervied from Q( epsilon greedy)
 %       Take action A, observe R, S'
-%       Q(S,A) <- Q(S,A) + alpha*[ R + gamma*max(sub_a)Q(S',a) - Q(S,A)]
-%       S<- S';
+%       Choose A' from S' using policy dervied from Q( epsilon greedy)
+%       Q(S,A) <- Q(S,A) + alpha*[ R + gamma*Q(S',A') - Q(S,A)]
+%       S<- S'; A<- A';
 %   Until S is terminal
 % NOte: Assume for this gridworld that you cannot take action to take
 % you off ":edge".
@@ -31,7 +34,6 @@ q(4,12,:) = 0;                  % terminal value zero; Note coordinate from uppe
 avg_time_incr_intervals = 100;  % helps average sum of rewards over 5 episodes
 episodes = avg_time_incr_intervals*5; 
 
-
 %debug
 time_steps = 0;
 sum_of_rewards_debug = zeros(1,episodes);
@@ -43,15 +45,15 @@ for n = 1: episodes
     cliffwalking   = 1;
     sum_of_rewards = 0;
     
+    % choose with epsilon greedy policy
+    random = rand(1); 
+    if( 1-epsilon > random)
+        [max_value,a_current] = max(q(i_current,j_current,:));
+    else
+        a_current = randi(4,1);
+    end
+    
     while cliffwalking
-        
-         % choose with epsilon greedy policy
-         random = rand(1); 
-         if( 1-epsilon > random)
-            [max_value,a_current] = max(q(i_current,j_current,:));
-         else
-             a_current = randi(a,1); 
-         end
         
         switch a_current
             case 1 % up
@@ -99,14 +101,21 @@ for n = 1: episodes
         end
        
      
-     % update action on max only!
-     [max_value,a_update] = max(q(i_update,j_update,:));
-       
+     % choose with epsilon greedy policy
+     random = rand(1); 
+     if( 1-epsilon > random)
+        [max_value,a_update] = max(q(i_update,j_update,:));
+     else
+        a_update = randi(4,1);
+     end
+     
      q(i_current,j_current,a_current) =  q(i_current,j_current,a_current) +...
-         alpha*(r + gamma*max_value - q(i_current,j_current,a_current) );
+         alpha*(r + gamma*q(i_update,j_update,a_update)  -...
+         q(i_current,j_current,a_current) );
      
      i_current = i_update;
      j_current = j_update;
+     a_current = a_update;
      
      % debug
      sum_of_rewards = sum_of_rewards + r;
@@ -135,7 +144,7 @@ figure(1)
 plot(avg_time_incr,temp_avg, '-r')
 xlabel('Epsiodes*5');
 ylabel('Sum of rewards during episode');
-title('Q-learning cliff walking performance');
+title('SARSA cliff walking performance');
 axis([-1 501 -500 -5])
 
 

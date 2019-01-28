@@ -34,19 +34,19 @@ clear all;
 
 % Init V(s)
 v = rand(1,20);
-%x = 10; 
-%y = 7;
-%epsilon = .1;      % for greedy policy
-%alpha = .5;        % step size
-gamma = .9;        % discount rate
-%q = zeros(7,10,9); % action-state space
-%q(4,8,:) = 0;      % terminal value zero; Note coordinate from upperleft
+
+n     =  3;                   % n-steps for TD
+gamma = .9;                   % discount rate
+alpha = .9;                   % step size
 episodes = 10;
-states_num = 21;    % Note States 1 and 21 are terminal
+states_num = 21;              % Note States 1 and 21 are terminal
 state_position = zeros(1,states_num); 
 current_state_position  = 11; % Note per Sutton we start at 11 center
-t = 0; % initial time
+t = 0;                        % initial time
 direction = [ -1 +1];
+tu = states_num* 10;          % For random walk I multipled by 10 as a guess
+                              % for needed timesteps
+r        = zeros(1,tu)        % initialize rewards
 
 
 %debug
@@ -54,7 +54,7 @@ direction = [ -1 +1];
 %episode_debug = zeros(1,episodes);
 
 
-for n = 1 : episodes
+for k = 1 : episodes
     T = 1e6; % in Sutton set to inifinity
     while tau ~= T-1
         if t < T
@@ -62,7 +62,7 @@ for n = 1 : episodes
             current_action = direction(action);
             next_state_position = current_state_position + current_action;
             % observe and store reward
-            r = 0;
+            r(t+1) = 0;
             if (next_state_position == 21 || next_state_position == 1)
                 T = t + 1;
             end
@@ -73,14 +73,18 @@ for n = 1 : episodes
             lower_limit_summation = tau + 1;
             G = 0;
             for  i = lower_limit_summation:upper_limit_summation 
-                G = G + gamma^(i-tau-1)*% What do I use for Ri??
+                G = G + (gamma^(i-tau-1))*r(t);
+            end
+            if tau + n < T
+                G = G + (gamma^n)*%% ?? How do I reprsent V here 
+            
             
             
             
             
         
         
-        
+    % update t    
     end
      
 end 

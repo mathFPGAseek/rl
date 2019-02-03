@@ -33,16 +33,17 @@
 clear all;
 
 % Init V(s)
-v = rand(1,20);
+states_num = 21;              % Note States 1 and 21 are terminal
+v = rand(1,states_num);
 
 n     =  3;                   % n-steps for TD
 gamma = .9;                   % discount rate
 alpha = .9;                   % step size
 episodes = 10;
-states_num = 21;              % Note States 1 and 21 are terminal
 state_position = zeros(1,states_num); 
 current_state_position  = 11; % Note per Sutton we start at 11 center
 t = 0;                        % initial time
+tau = 0;
 direction = [ -1 +1];
 tu = states_num* 10;          % For random walk I multipled by 10 as a guess
                               % for needed timesteps
@@ -66,8 +67,9 @@ for k = 1 : episodes
             if (next_state_position == 21 || next_state_position == 1)
                 T = t + 1;
             end
-        tau = t -n + 1;
-        if tau > 0
+        end
+        tau = t -n + 1; % update tau
+        if tau >= 0
             % Assign G execpt for discounted estimate gamma^n*Vt(St+1)
             upper_limit_summation = min( [tau+n T]);
             lower_limit_summation = tau + 1;
@@ -76,15 +78,14 @@ for k = 1 : episodes
                 G = G + (gamma^(i-tau-1))*r(t);
             end
             if tau + n < T
-                G = G + (gamma^n)*%% ?? How do I reprsent V here 
-            
-            
-            
-            
-            
-        
-        
-    % update t    
-    end
-     
+                G = G + (gamma^n)*V(tau+n);
+            end
+            V(tau) = V(tau) + alpha*(G - V(tau));      
+        end
+    % debug display
+    debug = 0;
+    % update t
+    t = t + 1;
+
+    end     
 end 

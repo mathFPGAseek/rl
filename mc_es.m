@@ -15,7 +15,7 @@
 %----------------------------------------------------------------
 
 %% Init values:
-E = 5000;
+E = 100000;
 S = 200; % Player hand 12-21; Dealer 2-Ace; Usable Ace
 A = 2; % 0 = stand ; 1 = hit
 D = .9; % Discount factor

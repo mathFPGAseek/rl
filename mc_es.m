@@ -164,7 +164,7 @@ for j = 1 : stateRows
     for i = 1 : stateRowLength
         i = i + k*stateRowLength; 
         stateTable(1,i) = lowestHand + (m-1);
-        m = m + 1
+        m = m + 1;
     end
     m = 1;
     k = k + 1;
@@ -366,7 +366,7 @@ end
         elseif ( playerHandStart == dealerHandFinal)
             r = 0; % We tied
         else
-            r = -1 % We lost
+            r = -1; % We lost
         end
         
         % Form our epsiodes
